@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyscharlie.cloud.usercenter.biz.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.lyscharlie.cloud.usercenter.biz.entity.UserDO">
+        <id property="userId" column="user_id" />
+        <result property="userName" column="user_name" />
+        <result property="password" column="password" />
+        <result property="email" column="email" />
+        <result property="mobile" column="mobile" />
+        <result property="registerReferId" column="register_refer_id" />
+        <result property="lastLoginTime" column="last_login_time" />
+        <result property="isDelete" column="is_delete" />
+        <result property="gmtCreate" column="gmt_create" />
+        <result property="gmtModified" column="gmt_modified" />
+    </resultMap>
+
+    <sql id="selectFields">
+        user_id,
+		user_name,
+		password,
+		email,
+		mobile,
+		register_refer_id,
+		last_login_time,
+        is_delete,
+		gmt_create,
+		gmt_modified
+    </sql>
+
+    <select id="selectCountByRegisterReferId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            lys_user l
+        WHERE
+            l.register_refer_id = #{registerReferId}
+    </select>
+
+    <select id="selectRandomUser" resultMap="userMap">
+        SELECT
+            <include refid="selectFields" />
+        FROM
+            lys_user
+        WHERE
+            is_delete = 0
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+</mapper>
