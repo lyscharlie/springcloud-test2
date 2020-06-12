@@ -1,0 +1,51 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: gateway-api
+  cloud:
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        register: true
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: areacenter
+          uri: lb://area-center
+          predicates:
+            - Path=/area-api/**
+          filters:
+            - StripPrefix=1
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+        - id: usercenter
+          uri: lb://user-center
+          predicates:
+            - Path=/user-api/**
+          filters:
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+                status: 503
+        - id: baidu
+          uri: https://www.baidu.com
+          predicates:
+            - Path=/baidu/**
+          filters:
+            - StripPrefix=1
+
+
+hystrix:
+  metrics:
+    polling-interval-ms: 5000
